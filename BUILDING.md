@@ -8,7 +8,9 @@ After pushing the project to GitHub, open **Actions → Android APK Build**, sel
 successful run, and download the `basalt-proxy-release-apks` artifact.
 
 The workflow uses the Android SDK/NDK versions selected for this project and does not
-require committing generated `.so` files or a signing key.
+require committing generated `.so` files or a signing key. Android 17 (API 37) is
+installed using the SDK package `platforms;android-37.0`; the workflow also creates the
+`platforms/android-37` alias expected by AGP when resolving `compileSdk = 37`.
 
 ## Local Windows build
 

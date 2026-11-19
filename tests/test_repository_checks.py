@@ -65,8 +65,25 @@ class RepositoryChecks(unittest.TestCase):
         workflow = (ROOT / ".github/workflows/android-build.yml").read_text(encoding="utf-8")
         self.assertNotRegex(workflow, r"(?m)^\s+uses:\s*android-actions/setup-android@")
         self.assertIn('"$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"', workflow)
-        self.assertIn('"platforms;android-37"', workflow)
+        self.assertIn('"platforms;android-37.0"', workflow)
+        self.assertNotIn('"platforms;android-37" \\', workflow)
+        self.assertIn('--channel=3', workflow)
+        self.assertIn('PLATFORM_VERSIONED="$ANDROID_HOME/platforms/android-37.0"', workflow)
+        self.assertIn('if [[ -d "$PLATFORM_VERSIONED" && ! -f "$PLATFORM_AGP/android.jar" ]]; then', workflow)
+        self.assertIn('rm -rf "$PLATFORM_AGP"', workflow)
+        self.assertIn('ln -s "android-37.0" "$PLATFORM_AGP"', workflow)
         self.assertIn('"ndk;28.2.13676358"', workflow)
+
+    def test_android_17_sdk_package_uses_minor_version_and_agp_alias(self):
+        workflow = (ROOT / ".github/workflows/android-build.yml").read_text(encoding="utf-8")
+        gradle = (ROOT / "app/build.gradle.kts").read_text(encoding="utf-8")
+        self.assertRegex(gradle, r"compileSdk\s*=\s*37")
+        self.assertRegex(gradle, r"targetSdk\s*=\s*37")
+        self.assertIn('"platforms;android-37.0"', workflow)
+        self.assertIn('PLATFORM_AGP="$ANDROID_HOME/platforms/android-37"', workflow)
+        self.assertIn('if [[ -d "$PLATFORM_VERSIONED" && ! -f "$PLATFORM_AGP/android.jar" ]]; then', workflow)
+        self.assertIn('rm -rf "$PLATFORM_AGP"', workflow)
+        self.assertIn('ln -s "android-37.0" "$PLATFORM_AGP"', workflow)
 
     def test_android_sdk_licenses_do_not_use_a_sigpipe_prone_yes_pipeline(self):
         workflow = (ROOT / ".github/workflows/android-build.yml").read_text(encoding="utf-8")
