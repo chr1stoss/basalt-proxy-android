@@ -39,7 +39,13 @@ jobs:
             exit 1
           fi
           echo "$ANDROID_HOME/cmdline-tools/latest/bin" >> "$GITHUB_PATH"
-          yes | "$SDKMANAGER" --licenses >/dev/null
+          # Feed license answers from a regular file, not a pipe. sdkmanager
+          # may close stdin as soon as it has enough answers; `yes | ...`
+          # then receives SIGPIPE and fails under `set -o pipefail`.
+          LICENSE_INPUT="$(mktemp)"
+          trap 'rm -f "$LICENSE_INPUT"' EXIT
+          for _ in {1..100}; do printf 'y\n'; done > "$LICENSE_INPUT"
+          "$SDKMANAGER" --licenses < "$LICENSE_INPUT" >/dev/null
 
       - name: Install Android SDK and NDK packages
         shell: bash

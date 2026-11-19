@@ -68,6 +68,12 @@ class RepositoryChecks(unittest.TestCase):
         self.assertIn('"platforms;android-37"', workflow)
         self.assertIn('"ndk;28.2.13676358"', workflow)
 
+    def test_android_sdk_licenses_do_not_use_a_sigpipe_prone_yes_pipeline(self):
+        workflow = (ROOT / ".github/workflows/android-build.yml").read_text(encoding="utf-8")
+        self.assertNotRegex(workflow, r"(?m)^\s*yes\s*\|")
+        self.assertIn("for _ in {1..100}; do printf 'y\\n'; done > \"$LICENSE_INPUT\"", workflow)
+        self.assertIn('"$SDKMANAGER" --licenses < "$LICENSE_INPUT"', workflow)
+
 
 
 if __name__ == "__main__":
