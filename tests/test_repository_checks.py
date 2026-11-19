@@ -92,6 +92,12 @@ class RepositoryChecks(unittest.TestCase):
         self.assertIn('"$SDKMANAGER" --licenses < "$LICENSE_INPUT"', workflow)
 
 
+    def test_gradle_wrapper_is_made_executable_before_release_build(self):
+        workflow = (ROOT / ".github/workflows/android-build.yml").read_text(encoding="utf-8")
+        build_step = workflow.split("- name: Build Release APKs", 1)[1].split("- name: Upload APK artifacts", 1)[0]
+        self.assertIn("chmod +x ./gradlew", build_step)
+        self.assertLess(build_step.index("chmod +x ./gradlew"), build_step.index("./gradlew --no-daemon assembleRelease"))
+        self.assertIn("test -f gradle/wrapper/gradle-wrapper.jar", build_step)
 
 if __name__ == "__main__":
     unittest.main()

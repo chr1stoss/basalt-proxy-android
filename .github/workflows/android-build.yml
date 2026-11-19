@@ -97,7 +97,15 @@ jobs:
           -o app/src/main/jniLibs build --release
 
       - name: Build Release APKs
-        run: ./gradlew --no-daemon assembleRelease
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Git may check out gradlew without its executable bit (mode 100644).
+          # Normalize permissions on the runner before invoking the wrapper.
+          chmod +x ./gradlew
+          test -f gradle/wrapper/gradle-wrapper.jar
+          test -f gradle/wrapper/gradle-wrapper.properties
+          ./gradlew --no-daemon assembleRelease
 
       - name: Upload APK artifacts
         uses: actions/upload-artifact@v4
