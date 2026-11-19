@@ -87,11 +87,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
-private const val AndroidForkRepoUrl = "https://github.com/wh1sper-basalt/basalt-proxy-android"
-private const val AndroidForkIssuesUrl = "https://github.com/wh1sper-basalt/basalt-proxy-android/issues"
-private const val DeveloperProfileUrl = "https://github.com/wh1sper-basalt"
-private const val OriginalProjectUrl = "https://github.com/wh1sper-basalt/basalt-proxy-android"
-private const val ProxyReferenceUrl = "https://github.com/wh1sper-basalt/basalt-proxy-android/issues"
+private const val AndroidForkRepoUrl = "https://github.com/chr1stoss/basalt-proxy-android"
+private const val AndroidForkIssuesUrl = "https://github.com/chr1stoss/basalt-proxy-android/issues"
+private const val DeveloperProfileUrl = "https://github.com/chr1stoss"
+private const val OriginalProjectUrl = "https://github.com/chr1stoss/basalt-proxy-android"
+private const val ProxyReferenceUrl = "https://github.com/chr1stoss/basalt-proxy-android/issues"
 
 private val Android16BlobShape: Shape = GenericShape { size, _ ->
     val centerX = size.width / 2f

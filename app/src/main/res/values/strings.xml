@@ -55,7 +55,7 @@
     <string name="update_already_latest">You already have the latest version: %1$s</string>
     <string name="about_project">About the project</string>
     <string name="android_author">Android version author</string>
-    <string name="android_author_subtitle">GitHub profile wh1sper-basalt</string>
+    <string name="android_author_subtitle">GitHub profile chr1stoss</string>
     <string name="android_fork_repo">Basalt Proxy repository</string>
     <string name="android_fork_repo_subtitle">Source code and releases for this app</string>
     <string name="useful_material">Useful material</string>

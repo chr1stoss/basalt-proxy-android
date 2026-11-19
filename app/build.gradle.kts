@@ -104,7 +104,9 @@ android {
                 signingConfig = signingConfigs.getByName("release")
                 println("✅ Signing config applied: ${resolvedFile.absolutePath}")
             } else {
-                println("⚠️ WARNING: Keystore not found, using debug signing")
+                // Keep Release APKs installable when no private release keystore is configured.
+                signingConfig = signingConfigs.getByName("debug")
+                println("⚠️ WARNING: Keystore not found, signing Release with the debug key")
                 println("   Looked for: ${resolvedFile?.absolutePath ?: keyFile}")
             }
         }

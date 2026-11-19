@@ -75,6 +75,26 @@ fun openTelegram(context: Context, url: String) {
     }
 }
 
+@Composable
+private fun SettingsAnimatedVisibility(
+    visible: Boolean,
+    content: @Composable () -> Unit
+) {
+    AnimatedVisibility(
+        visible = visible,
+        enter = expandVertically(
+            expandFrom = Alignment.Top,
+            animationSpec = tween(300, easing = FastOutSlowInEasing)
+        ) + fadeIn(tween(220)),
+        exit = shrinkVertically(
+            shrinkTowards = Alignment.Top,
+            animationSpec = tween(280, easing = FastOutSlowInEasing)
+        ) + fadeOut(tween(180))
+    ) {
+        content()
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsTab(settingsStore: SettingsStore) {
@@ -478,11 +498,7 @@ fun SettingsTab(settingsStore: SettingsStore) {
                 })
             }
 
-            AnimatedVisibility(
-                visible = !isBasaltTheme,
-                enter = expandVertically(tween(300, easing = FastOutSlowInEasing)) + fadeIn(tween(220)),
-                exit = shrinkVertically(tween(280, easing = FastOutSlowInEasing)) + fadeOut(tween(180))
-            ) {
+            SettingsAnimatedVisibility(visible = !isBasaltTheme) {
                 Column(modifier = Modifier.padding(top = 12.dp)) {
                     HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.35f))
 
@@ -500,10 +516,8 @@ fun SettingsTab(settingsStore: SettingsStore) {
                         )
                     }
 
-                    AnimatedVisibility(
-                        visible = !(isDynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S),
-                        enter = expandVertically(tween(300, easing = FastOutSlowInEasing)) + fadeIn(tween(220)),
-                        exit = shrinkVertically(tween(280, easing = FastOutSlowInEasing)) + fadeOut(tween(180))
+                    SettingsAnimatedVisibility(
+                        visible = !(isDynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
                     ) {
                         Column(modifier = Modifier.padding(top = 12.dp)) {
                             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.35f))
@@ -582,11 +596,7 @@ fun SettingsTab(settingsStore: SettingsStore) {
                 })
             }
 
-            AnimatedVisibility(
-                visible = vibrationEnabled,
-                enter = expandVertically(tween(300, easing = FastOutSlowInEasing)) + fadeIn(tween(220)),
-                exit = shrinkVertically(tween(280, easing = FastOutSlowInEasing)) + fadeOut(tween(180))
-            ) {
+            SettingsAnimatedVisibility(visible = vibrationEnabled) {
                 Column(modifier = Modifier.padding(top = 12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.35f))
 

@@ -115,7 +115,7 @@ pub static CFPROXY_429: Lazy<RwLock<HashMap<String, Cfproxy429State>>> =
     Lazy::new(|| RwLock::new(HashMap::new()));
 
 pub const CFPROXY_DOMAINS_URL: &str =
-    "https://raw.githubusercontent.com/wh1sper-basalt/basalt-proxy-android/main/.github/cfproxy-domains.txt";
+    "https://raw.githubusercontent.com/chr1stoss/basalt-proxy-android/main/.github/cfproxy-domains.txt";
 
 pub static PROXY_SECRET: Lazy<RwLock<String>> =
     Lazy::new(|| RwLock::new("00000000000000000000000000000000".to_string()));

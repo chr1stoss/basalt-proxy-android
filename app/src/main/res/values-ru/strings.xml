@@ -55,7 +55,7 @@
     <string name="update_already_latest">У вас уже последняя версия: %1$s</string>
     <string name="about_project">О проекте</string>
     <string name="android_author">Автор Android-версии</string>
-    <string name="android_author_subtitle">GitHub профиль wh1sper-basalt</string>
+    <string name="android_author_subtitle">GitHub профиль chr1stoss</string>
     <string name="android_fork_repo">Репозиторий Basalt Proxy</string>
     <string name="android_fork_repo_subtitle">Исходники и релизы этого приложения</string>
     <string name="useful_material">Полезный материал</string>

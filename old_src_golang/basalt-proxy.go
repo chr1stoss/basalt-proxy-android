@@ -105,7 +105,7 @@ var (
 	cfproxyAttemptSem       = make(chan struct{}, cfproxyGlobalParallel)
 )
 
-const cfproxyDomainsURL = "https://raw.githubusercontent.com/wh1sper-basalt/basalt-proxy-android/main/.github/cfproxy-domains.txt"
+const cfproxyDomainsURL = "https://raw.githubusercontent.com/chr1stoss/basalt-proxy-android/main/.github/cfproxy-domains.txt"
 
 var (
 	proxySecret   = "00000000000000000000000000000000"

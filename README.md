@@ -7,8 +7,8 @@
   <img src="https://img.shields.io/badge/Rust-1.70+-000000?style=for-the-badge&logo=rust&logoColor=white" alt="Rust Version">
   <img src="https://img.shields.io/badge/Kotlin-Native-7F52FF?style=for-the-badge&logo=kotlin&logoColor=white" alt="Kotlin">
   <img src="https://img.shields.io/badge/License-MIT-8B3FFD?style=for-the-badge" alt="License: MIT">
-  <a href="https://github.com/wh1sper-basalt/basalt-proxy-android/stargazers">
-    <img src="https://img.shields.io/github/stars/wh1sper-basalt/basalt-proxy-android?style=for-the-badge&logo=github&color=ffca28&labelColor=24292e" alt="Stars">
+  <a href="https://github.com/chr1stoss/basalt-proxy-android/stargazers">
+    <img src="https://img.shields.io/github/stars/chr1stoss/basalt-proxy-android?style=for-the-badge&logo=github&color=ffca28&labelColor=24292e" alt="Stars">
   </a>
 </div>
 <br>
@@ -116,4 +116,4 @@ build_apk.bat
 
 ## Лицензия
 
-Проект распространяется под лицензией MIT.
+Проект распространяется под лицензией PolyForm Noncommercial License 1.0.0.

@@ -33,3 +33,7 @@ target/
 .vscode/
 .DS_Store
 Thumbs.db
+# Python tests
+__pycache__/
+*.py[cod]
+.pytest_cache/
