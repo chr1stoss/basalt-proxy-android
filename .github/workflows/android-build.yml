@@ -22,12 +22,29 @@ jobs:
           distribution: temurin
           java-version: "17"
 
+      # GitHub's Ubuntu runners already provide Android command-line tools.
+      # Avoid android-actions/setup-android@v3 here: it invokes `sdkmanager tools`,
+      # but the legacy `tools` SDK package is no longer published by Google.
       - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "${ANDROID_HOME:-}" ]]; then
+            echo "::error::ANDROID_HOME is not set on this runner"
+            exit 1
+          fi
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          if [[ ! -x "$SDKMANAGER" ]]; then
+            echo "::error::Android sdkmanager not found at $SDKMANAGER"
+            exit 1
+          fi
+          echo "$ANDROID_HOME/cmdline-tools/latest/bin" >> "$GITHUB_PATH"
+          yes | "$SDKMANAGER" --licenses >/dev/null
 
       - name: Install Android SDK and NDK packages
+        shell: bash
         run: |
-          yes | sdkmanager --licenses >/dev/null
+          set -euo pipefail
           sdkmanager --install \
             "platforms;android-37" \
             "build-tools;36.0.0" \

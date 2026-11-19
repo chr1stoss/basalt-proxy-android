@@ -61,6 +61,13 @@ class RepositoryChecks(unittest.TestCase):
         self.assertIn("./gradlew --no-daemon assembleRelease", workflow)
         self.assertIn("app/build/outputs/apk/*/release/*.apk", workflow)
 
+    def test_android_workflow_does_not_install_removed_legacy_sdk_tools_package(self):
+        workflow = (ROOT / ".github/workflows/android-build.yml").read_text(encoding="utf-8")
+        self.assertNotRegex(workflow, r"(?m)^\s+uses:\s*android-actions/setup-android@")
+        self.assertIn('"$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"', workflow)
+        self.assertIn('"platforms;android-37"', workflow)
+        self.assertIn('"ndk;28.2.13676358"', workflow)
+
 
 
 if __name__ == "__main__":
