@@ -16,6 +16,43 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
+      - name: Locate project root with verified Gradle repositories
+        id: project-root
+        shell: bash
+        run: |
+          set -euo pipefail
+          MIRROR="https://maven-central-eu.storage-download.googleapis.com/maven2/"
+          PROJECT_ROOT=""
+          while IFS= read -r -d '' settings_file; do
+            candidate="${settings_file%/settings.gradle.kts}"
+            [[ -n "$candidate" ]] || candidate="."
+            if [[ -f "$candidate/gradlew" \
+               && -f "$candidate/build.gradle.kts" \
+               && -f "$candidate/app/build.gradle.kts" \
+               && -f "$candidate/Cargo.toml" \
+               && -f "$candidate/gradle/wrapper/gradle-wrapper.jar" ]] \
+               && grep -Fq "$MIRROR" "$settings_file" \
+               && grep -Fq "$MIRROR" "$candidate/build.gradle.kts"; then
+              PROJECT_ROOT="$candidate"
+              break
+            fi
+          done < <(find . -maxdepth 6 -type f -name 'settings.gradle.kts' \
+                    -not -path '*/.gradle/*' -print0)
+
+          if [[ -z "$PROJECT_ROOT" ]]; then
+            echo "::error::Could not find the updated BasaltProxy Gradle root. The checkout must contain settings.gradle.kts, build.gradle.kts, app/build.gradle.kts, Cargo.toml, gradlew, gradle-wrapper.jar, and the Google Maven Central mirror."
+            echo "Gradle settings files found:"
+            find . -maxdepth 6 -type f -name 'settings.gradle.kts' -not -path '*/.gradle/*' -print
+            exit 1
+          fi
+
+          echo "path=$PROJECT_ROOT" >> "$GITHUB_OUTPUT"
+          echo "Using Gradle project root: $PROJECT_ROOT"
+          echo "--- settings.gradle.kts ---"
+          sed -n '1,100p' "$PROJECT_ROOT/settings.gradle.kts"
+          echo "--- build.gradle.kts ---"
+          sed -n '1,100p' "$PROJECT_ROOT/build.gradle.kts"
+
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
@@ -87,11 +124,13 @@ jobs:
         run: cargo install cargo-ndk --locked
 
       - name: Build native arm64 library
+        working-directory: ${{ steps.project-root.outputs.path }}
         run: >-
           cargo ndk -t arm64-v8a --platform 24
           -o app/src/main/jniLibs build --release
 
       - name: Build native arm32 library
+        working-directory: ${{ steps.project-root.outputs.path }}
         run: >-
           cargo ndk -t armeabi-v7a --platform 21
           -o app/src/main/jniLibs build --release
@@ -104,6 +143,7 @@ jobs:
           cache-provider: basic
 
       - name: Build Release APKs
+        working-directory: ${{ steps.project-root.outputs.path }}
         shell: bash
         run: |
           set -euo pipefail
@@ -118,6 +158,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: basalt-proxy-release-apks
-          path: app/build/outputs/apk/*/release/*.apk
+          path: ${{ steps.project-root.outputs.path }}/app/build/outputs/apk/*/release/*.apk
           if-no-files-found: error
           retention-days: 14

@@ -42,3 +42,12 @@ Google Maven, Gradle Plugin Portal, and Maven Central as fallbacks. GitHub
 Actions also restores/saves the Gradle dependency cache using
 `gradle/actions/setup-gradle@v6`. The Compose compiler plugin version is pinned
 to Kotlin 2.4.10 to match the current Android Gradle Plugin 9.4 toolchain.
+
+## GitHub Actions: repository root
+
+For the Android workflow to use the same Gradle configuration as this source archive,
+commit the contents of the `basalt-proxy-android` folder at the Git repository root.
+The files `settings.gradle.kts`, `build.gradle.kts`, `app/build.gradle.kts`, and
+`.github/workflows/android-build.yml` must all be at the paths checked by the workflow.
+The workflow verifies the active checkout before invoking Gradle and prints the actual
+repository configuration in its log.

@@ -99,24 +99,46 @@ class RepositoryChecks(unittest.TestCase):
         self.assertLess(build_step.index("chmod +x ./gradlew"), build_step.index("./gradlew --no-daemon assembleRelease"))
         self.assertIn("test -f gradle/wrapper/gradle-wrapper.jar", build_step)
 
-    def test_maven_central_mirror_is_first_for_plugin_and_library_resolution(self):
+    def test_maven_central_mirror_is_configured_for_plugin_and_library_resolution(self):
         settings = (ROOT / "settings.gradle.kts").read_text(encoding="utf-8")
-        mirror = 'maven { url = uri("https://maven-central-eu.storage-download.googleapis.com/maven2/") }'
+        mirror = 'https://maven-central-eu.storage-download.googleapis.com/maven2/'
 
-        self.assertEqual(settings.count(mirror), 2)
         plugin_management = settings.split("pluginManagement {", 1)[1].split("dependencyResolutionManagement {", 1)[0]
         dependency_resolution = settings.split("dependencyResolutionManagement {", 1)[1]
-        self.assertLess(plugin_management.index(mirror), plugin_management.index("google()"))
-        self.assertLess(dependency_resolution.index(mirror), dependency_resolution.index("google()"))
+        self.assertIn(mirror, plugin_management)
+        self.assertIn(mirror, dependency_resolution)
+        self.assertLess(plugin_management.index("google()"), plugin_management.index(mirror))
+        self.assertLess(dependency_resolution.index("google()"), dependency_resolution.index(mirror))
         self.assertIn("gradlePluginPortal()", plugin_management)
-        self.assertIn("mavenCentral()", plugin_management)
-        self.assertIn("mavenCentral()", dependency_resolution)
+        self.assertNotIn("mavenCentral()", plugin_management)
+        self.assertNotIn("mavenCentral()", dependency_resolution)
 
-    def test_compose_compiler_plugin_matches_current_kotlin_toolchain(self):
+    def test_root_buildscript_classpath_uses_maven_central_mirror(self):
+        build = (ROOT / "build.gradle.kts").read_text(encoding="utf-8")
+        self.assertIn("buildscript {", build)
+        self.assertIn('maven { url = uri("https://maven-central-eu.storage-download.googleapis.com/maven2/") }', build)
+        self.assertLess(build.index("buildscript {"), build.index("plugins {"))
+
+    def test_compose_compiler_plugin_matches_agp_94_default_kotlin_version(self):
         build = (ROOT / "build.gradle.kts").read_text(encoding="utf-8")
         self.assertIn('id("com.android.application") version "9.4.0" apply false', build)
-        self.assertIn('id("org.jetbrains.kotlin.plugin.compose") version "2.4.10" apply false', build)
-        self.assertNotIn('org.jetbrains.kotlin.plugin.compose") version "2.2.10"', build)
+        self.assertIn('id("org.jetbrains.kotlin.plugin.compose") version "2.2.10" apply false', build)
+        self.assertNotIn('org.jetbrains.kotlin.plugin.compose") version "2.4.10"', build)
+
+    def test_android_workflow_finds_correct_project_root_even_when_nested(self):
+        workflow = (ROOT / ".github/workflows/android-build.yml").read_text(encoding="utf-8")
+        self.assertIn("- name: Locate project root with verified Gradle repositories", workflow)
+        self.assertIn("find . -maxdepth 6 -type f -name 'settings.gradle.kts'", workflow)
+        self.assertIn('&& -f "$candidate/Cargo.toml"', workflow)
+        self.assertIn('grep -Fq "$MIRROR" "$settings_file"', workflow)
+        self.assertIn('grep -Fq "$MIRROR" "$candidate/build.gradle.kts"', workflow)
+        self.assertIn('working-directory: ${{ steps.project-root.outputs.path }}', workflow)
+        self.assertIn('path: ${{ steps.project-root.outputs.path }}/app/build/outputs/apk/*/release/*.apk', workflow)
+
+    def test_python_workflow_finds_tests_when_project_is_nested(self):
+        workflow = (ROOT / ".github/workflows/python-ci.yml").read_text(encoding="utf-8")
+        self.assertIn("Could not locate tests/test_repository_checks.py", workflow)
+        self.assertIn("python -m unittest discover -s tests -v", workflow)
 
     def test_gradle_user_home_cache_is_enabled_in_android_workflow(self):
         workflow = (ROOT / ".github/workflows/android-build.yml").read_text(encoding="utf-8")

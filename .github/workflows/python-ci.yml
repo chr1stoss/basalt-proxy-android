@@ -22,4 +22,17 @@ jobs:
           python-version: "3.12"
 
       - name: Run tests
-        run: python -m unittest discover -s tests -v
+        shell: bash
+        run: |
+          set -euo pipefail
+          PROJECT_ROOT="."
+          if [[ ! -f "$PROJECT_ROOT/tests/test_repository_checks.py" ]]; then
+            TEST_FILE="$(find . -maxdepth 6 -type f -path '*/tests/test_repository_checks.py' -print -quit)"
+            if [[ -z "$TEST_FILE" ]]; then
+              echo "::error::Could not locate tests/test_repository_checks.py"
+              exit 1
+            fi
+            PROJECT_ROOT="${TEST_FILE%/tests/test_repository_checks.py}"
+          fi
+          cd "$PROJECT_ROOT"
+          python -m unittest discover -s tests -v

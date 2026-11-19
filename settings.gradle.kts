@@ -1,22 +1,20 @@
 pluginManagement {
     repositories {
-        // Maven Central started enforcing stricter request limits in Nov 2026.
-        // Use Google's hosted mirror first to keep GitHub Actions dependency
-        // resolution reliable, while retaining the canonical repositories as
-        // fallbacks for artifacts not mirrored there.
-        maven { url = uri("https://maven-central-eu.storage-download.googleapis.com/maven2/") }
+        // Plugin artifacts from Google are served by Google's Maven repository.
         google()
+        // All Maven Central artifacts use Google's public mirror to avoid
+        // direct requests to Maven Central's rate-limited endpoint.
+        maven { url = uri("https://maven-central-eu.storage-download.googleapis.com/maven2/") }
+        // Plugin markers and plugins not hosted in Google Maven / Central.
         gradlePluginPortal()
-        mavenCentral()
     }
 }
 
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
-        maven { url = uri("https://maven-central-eu.storage-download.googleapis.com/maven2/") }
         google()
-        mavenCentral()
+        maven { url = uri("https://maven-central-eu.storage-download.googleapis.com/maven2/") }
     }
 }
 
