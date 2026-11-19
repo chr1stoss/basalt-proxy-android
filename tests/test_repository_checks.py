@@ -99,5 +99,30 @@ class RepositoryChecks(unittest.TestCase):
         self.assertLess(build_step.index("chmod +x ./gradlew"), build_step.index("./gradlew --no-daemon assembleRelease"))
         self.assertIn("test -f gradle/wrapper/gradle-wrapper.jar", build_step)
 
+    def test_maven_central_mirror_is_first_for_plugin_and_library_resolution(self):
+        settings = (ROOT / "settings.gradle.kts").read_text(encoding="utf-8")
+        mirror = 'maven { url = uri("https://maven-central-eu.storage-download.googleapis.com/maven2/") }'
+
+        self.assertEqual(settings.count(mirror), 2)
+        plugin_management = settings.split("pluginManagement {", 1)[1].split("dependencyResolutionManagement {", 1)[0]
+        dependency_resolution = settings.split("dependencyResolutionManagement {", 1)[1]
+        self.assertLess(plugin_management.index(mirror), plugin_management.index("google()"))
+        self.assertLess(dependency_resolution.index(mirror), dependency_resolution.index("google()"))
+        self.assertIn("gradlePluginPortal()", plugin_management)
+        self.assertIn("mavenCentral()", plugin_management)
+        self.assertIn("mavenCentral()", dependency_resolution)
+
+    def test_compose_compiler_plugin_matches_current_kotlin_toolchain(self):
+        build = (ROOT / "build.gradle.kts").read_text(encoding="utf-8")
+        self.assertIn('id("com.android.application") version "9.4.0" apply false', build)
+        self.assertIn('id("org.jetbrains.kotlin.plugin.compose") version "2.4.10" apply false', build)
+        self.assertNotIn('org.jetbrains.kotlin.plugin.compose") version "2.2.10"', build)
+
+    def test_gradle_user_home_cache_is_enabled_in_android_workflow(self):
+        workflow = (ROOT / ".github/workflows/android-build.yml").read_text(encoding="utf-8")
+        self.assertIn("uses: gradle/actions/setup-gradle@v6", workflow)
+        self.assertIn("cache-provider: basic", workflow)
+        self.assertLess(workflow.index("uses: gradle/actions/setup-gradle@v6"), workflow.index("./gradlew --no-daemon assembleRelease"))
+
 if __name__ == "__main__":
     unittest.main()

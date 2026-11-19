@@ -34,3 +34,11 @@ python -m unittest discover -s tests -v
 ```
 
 The GitHub Actions workflow `Python CI` runs the same command on pushes and pull requests.
+
+### Maven Central rate limits in CI
+
+The Gradle settings prefer Google's EU-hosted Maven Central mirror and retain
+Google Maven, Gradle Plugin Portal, and Maven Central as fallbacks. GitHub
+Actions also restores/saves the Gradle dependency cache using
+`gradle/actions/setup-gradle@v6`. The Compose compiler plugin version is pinned
+to Kotlin 2.4.10 to match the current Android Gradle Plugin 9.4 toolchain.

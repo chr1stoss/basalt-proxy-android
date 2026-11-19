@@ -96,6 +96,13 @@ jobs:
           cargo ndk -t armeabi-v7a --platform 21
           -o app/src/main/jniLibs build --release
 
+      # Cache Gradle distributions and resolved dependencies between CI runs.
+      # This reduces Maven Central traffic and avoids unnecessary re-downloads.
+      - name: Set up Gradle and dependency cache
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          cache-provider: basic
+
       - name: Build Release APKs
         shell: bash
         run: |
