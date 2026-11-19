@@ -12,6 +12,11 @@ require committing generated `.so` files or a signing key. Android 17 (API 37) i
 installed using the SDK package `platforms;android-37.0`; the workflow also creates the
 `platforms/android-37` alias expected by AGP when resolving `compileSdk = 37`.
 
+The ARM32 APK requires Android 6.0 (API 23) or newer because the current AndroidX
+AppCompat 1.8.0 dependency raised its minimum SDK from API 21 to API 23. The ARM64 and
+Universal APKs require API 24 because the ARM64 native library is built with NDK
+platform 24. The ARM32 native library is built with NDK platform 23.
+
 ## Local Windows build
 
 1. Install Android Studio / Android SDK and the Rust toolchain.
@@ -41,7 +46,7 @@ The Gradle settings prefer Google's EU-hosted Maven Central mirror and retain
 Google Maven, Gradle Plugin Portal, and Maven Central as fallbacks. GitHub
 Actions also restores/saves the Gradle dependency cache using
 `gradle/actions/setup-gradle@v6`. The Compose compiler plugin version is pinned
-to Kotlin 2.4.10 to match the current Android Gradle Plugin 9.4 toolchain.
+to Kotlin 2.2.10 to match the current Android Gradle Plugin 9.4 toolchain.
 
 ## GitHub Actions: repository root
 

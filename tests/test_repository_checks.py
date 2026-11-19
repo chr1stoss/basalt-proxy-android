@@ -57,7 +57,7 @@ class RepositoryChecks(unittest.TestCase):
     def test_android_workflow_builds_native_libraries_before_apks(self):
         workflow = (ROOT / ".github/workflows/android-build.yml").read_text(encoding="utf-8")
         self.assertIn("cargo ndk -t arm64-v8a --platform 24", workflow)
-        self.assertIn("cargo ndk -t armeabi-v7a --platform 21", workflow)
+        self.assertIn("cargo ndk -t armeabi-v7a --platform 23", workflow)
         self.assertIn("./gradlew --no-daemon assembleRelease", workflow)
         self.assertIn("app/build/outputs/apk/*/release/*.apk", workflow)
 
@@ -84,6 +84,23 @@ class RepositoryChecks(unittest.TestCase):
         self.assertIn('if [[ -d "$PLATFORM_VERSIONED" && ! -f "$PLATFORM_AGP/android.jar" ]]; then', workflow)
         self.assertIn('rm -rf "$PLATFORM_AGP"', workflow)
         self.assertIn('ln -s "android-37.0" "$PLATFORM_AGP"', workflow)
+
+
+    def test_android_min_sdk_matches_current_androidx_dependencies(self):
+        gradle = (ROOT / "app/build.gradle.kts").read_text(encoding="utf-8")
+        workflow = (ROOT / ".github/workflows/android-build.yml").read_text(encoding="utf-8")
+        arm32 = gradle.split('create("arm32") {', 1)[1].split("        }", 1)[0]
+        arm64 = gradle.split('create("arm64") {', 1)[1].split("        }", 1)[0]
+        universal = gradle.split('create("universal") {', 1)[1].split("        }", 1)[0]
+
+        self.assertRegex(arm32, r"minSdk\s*=\s*23")
+        self.assertRegex(arm64, r"minSdk\s*=\s*24")
+        self.assertRegex(universal, r"minSdk\s*=\s*24")
+        self.assertIn('implementation("androidx.appcompat:appcompat:1.8.0")', gradle)
+        self.assertIn("versionCode = 1337", gradle)
+        self.assertIn('versionName = "1.3.3.7"', gradle)
+        self.assertIn("cargo ndk -t armeabi-v7a --platform 23", workflow)
+        self.assertNotIn("cargo ndk -t armeabi-v7a --platform 21", workflow)
 
     def test_android_sdk_licenses_do_not_use_a_sigpipe_prone_yes_pipeline(self):
         workflow = (ROOT / ".github/workflows/android-build.yml").read_text(encoding="utf-8")

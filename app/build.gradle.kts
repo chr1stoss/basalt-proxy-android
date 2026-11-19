@@ -29,7 +29,8 @@ android {
     productFlavors {
         create("arm32") {
             dimension = "arch"
-            minSdk = 21
+            // AppCompat 1.8.0 and the current AndroidX stack require API 23.
+            minSdk = 23
             ndk {
                 abiFilters.clear()
                 abiFilters.add("armeabi-v7a")
@@ -45,7 +46,8 @@ android {
         }
         create("universal") {
             dimension = "arch"
-            minSdk = 21
+            // Universal APK also includes the ARM64 native library built for API 24.
+            minSdk = 24
             ndk {
                 abiFilters.clear()
                 abiFilters.addAll(listOf("arm64-v8a", "armeabi-v7a"))

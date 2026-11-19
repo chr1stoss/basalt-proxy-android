@@ -132,7 +132,7 @@ jobs:
       - name: Build native arm32 library
         working-directory: ${{ steps.project-root.outputs.path }}
         run: >-
-          cargo ndk -t armeabi-v7a --platform 21
+          cargo ndk -t armeabi-v7a --platform 23
           -o app/src/main/jniLibs build --release
 
       # Cache Gradle distributions and resolved dependencies between CI runs.
